@@ -3,11 +3,10 @@ const consign = require('consign')
 
 const app = express();
 
-app.set('json spaces', 2);
-
 consign()
-  .include('models')
-  .then('config/middlewares.js')
+  .include('db.js')
+  .then('models')
+  .then('middlewares.js')
   .then('routes')
-  .then('config/boot.js')
+  .then('boot.js')
   .into(app);
