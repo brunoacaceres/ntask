@@ -7,7 +7,7 @@ app.set('json spaces', 2);
 
 consign()
   .include('models')
-  .then('middlewares.js')
+  .then('config/middlewares.js')
   .then('routes')
-  .then('boot.js')
+  .then('config/boot.js')
   .into(app);
