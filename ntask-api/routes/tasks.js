@@ -2,10 +2,12 @@ module.exports = app => {
   const Tasks = app.models.tasks;
 
   app.route('/tasks')
+    .all(app.auth.authenticate())
     .get(async (req, res) => {
       //	"/tasks":	Lista	tarefas
       try {
-        const result = await Tasks.findAll();
+        const where = { userId: req.user.id };
+        const result = await Tasks.findAll({ where });
         res.json(result);
       } catch (err) {
         res.status(412).json({ msg: err.message });
@@ -14,18 +16,20 @@ module.exports = app => {
     .post(async (req, res) => {
       //	"/tasks":	Cadastra	uma	nova	tarefa
       try {
+        req.body.userId = req.user.id;
         const result = await Tasks.create(req.body);
         res.json(result);
       } catch (err) {
         res.status(412).json({ msg: err.message });
       }
     });
-  app.route('/tasks/:id')
+    app.route('/tasks/:id')
+    .all(app.auth.authenticate())
     .get(async (req, res) => {
       //	"/tasks/1":	Consulta uma	tarefa
       try {
         const { id } = req.params;
-        const where = { id }
+        const where = { id, userId: req.user.id };
         const result = await Tasks.findOne({ where })
         if (result) {
           res.json(result);
@@ -40,7 +44,8 @@ module.exports = app => {
       //	"/tasks/1":	Atualiza	uma	tarefa
       try {
         const { id } = req.params;
-        const where = { id };
+        const where = { id, userId: req.user.id };
+        req.body.userId = req.user.id;
         await Tasks.update(req.body, { where });
         res.sendStatus(204);
       } catch (err) {
@@ -51,12 +56,11 @@ module.exports = app => {
       //"/tasks/1":	Exclui uma	tarefa
       try {
         const { id } = req.params;
-        const where = { id };
+        const where = { id, userId: req.user.id };
         await Tasks.destroy({ where })
         res.sendStatus(204);
       } catch (err) {
         res.status(412).json({ msg: err.message });
       }
     });
-
 };

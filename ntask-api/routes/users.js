@@ -1,7 +1,9 @@
 module.exports = app => {
   const Users = app.models.users;
 
-  app.get('/users/:id', async (req, res) => {
+  app.route('/user')
+  .all(app.auth.authenticate())
+  .get(async (req, res) => {
     try {
       const { id } = req.params;
       const attributes = ['id', 'name', 'email'];
@@ -16,8 +18,7 @@ module.exports = app => {
       res.status(412).json({ msg: err.message })
     }
   })
-
-  app.delete('/users/:id', async (req, res) => {
+  .delete(async (req, res) => {
     try {
       const { id } = req.params;
       const where = { id };
